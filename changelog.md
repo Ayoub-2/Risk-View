@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Documentation Overhaul:** Completely rewrote `README.md` for the v1.0.0 release to accurately reflect the new EBIOS RM architecture, PostgreSQL/Docker integration, UI refont, and future roadmap.
 - Expanded `project-docs/analysis/infosecpanda_review.md` with detailed deep-dive reviews of NIST, ISO, and PCI DSS dashboards.
 - Updated `project-docs/qa/qa_report_infosecpanda.md` with browser-based validation results.
 - Created `project-docs/analysis/infosecpanda_review.md` containing an analysis of the InfoSecPanda website.
