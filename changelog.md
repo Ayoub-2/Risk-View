@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **GRC Feature Expansion:** Integrated advanced InfoSecPanda-inspired features:
+  - **Evidence Checklists:** "Definition-of-Done" fields for Baseline Controls and Risk Treatments to prove compliance.
+  - **Contextual Guidance:** Interactive "Panda-style" help panels in Workshops 2 & 5 to explain Threat Sources, Objectives, and ISO/CIS controls.
+  - **Cross-Walk Mapping:** Integrated subsets of ISO 27001 Annex A and CIS Controls for standardized risk treatment mapping.
+  - **ROI Tracking:** Added a "Difficulty" metric to treatments, enabling the dashboard to automatically calculate and sort the highest ROI security improvements.
 - **Documentation Overhaul:** Completely rewrote `README.md` for the v1.0.0 release to accurately reflect the new EBIOS RM architecture, PostgreSQL/Docker integration, UI refont, and future roadmap.
 - Expanded `project-docs/analysis/infosecpanda_review.md` with detailed deep-dive reviews of NIST, ISO, and PCI DSS dashboards.
 - Updated `project-docs/qa/qa_report_infosecpanda.md` with browser-based validation results.

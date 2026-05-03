@@ -62,23 +62,73 @@ export default function ProjectDetails({ isNew }) {
         </div>
 
         {!isNew && project && (
-          <div className="bg-white p-6 rounded-2xl shadow-xl mb-8 flex flex-col md:flex-row gap-8 border border-gray-100">
-            <div className="flex-1 bg-gray-50 p-6 rounded-xl border border-gray-200">
-              <h2 className="text-2xl font-bold mb-4 text-ebios-dark">Aperçu des Risques</h2>
-              <div className="space-y-4">
-                 <p className="text-lg flex justify-between">
-                   <span className="text-gray-600">Risque Initial Moyen:</span> 
-                   <span className="font-bold text-red-600 bg-red-100 px-3 py-1 rounded-md">{project.average_initial_risk}</span>
-                 </p>
-                 <p className="text-lg flex justify-between">
-                   <span className="text-gray-600">Risque Résiduel Moyen:</span> 
-                   <span className="font-bold text-green-600 bg-green-100 px-3 py-1 rounded-md">{project.average_residual_risk}</span>
-                 </p>
+          <div className="space-y-8 mb-8">
+            <div className="bg-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row gap-8 border border-gray-100">
+              <div className="flex-1 bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <h2 className="text-2xl font-bold mb-4 text-ebios-dark">Aperçu des Risques</h2>
+                <div className="space-y-4">
+                   <p className="text-lg flex justify-between">
+                     <span className="text-gray-600">Risque Initial Moyen:</span> 
+                     <span className="font-bold text-red-600 bg-red-100 px-3 py-1 rounded-md">{project.average_initial_risk}</span>
+                   </p>
+                   <p className="text-lg flex justify-between">
+                     <span className="text-gray-600">Risque Résiduel Moyen:</span> 
+                     <span className="font-bold text-green-600 bg-green-100 px-3 py-1 rounded-md">{project.average_residual_risk}</span>
+                   </p>
+                </div>
+              </div>
+              <div className="flex-1">
+                <HeatMapComp scenarios={project.risk_results?.scenario_breakdown || []} />
               </div>
             </div>
-            <div className="flex-1">
-              <HeatMapComp scenarios={project.risk_results?.scenario_breakdown || []} />
-            </div>
+
+            {/* ROI and Compliance Overview */}
+            {project.risk_results?.scenario_breakdown?.length > 0 && (
+              <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
+                <h2 className="text-2xl font-bold mb-4 text-ebios-dark">Priorisation des Traitements (ROI & Conformité)</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="p-3 text-sm font-semibold text-gray-600">Scénario</th>
+                        <th className="p-3 text-sm font-semibold text-gray-600">Décision</th>
+                        <th className="p-3 text-sm font-semibold text-gray-600">Cartographie (ISO/CIS)</th>
+                        <th className="p-3 text-sm font-semibold text-gray-600">Réduction Risque</th>
+                        <th className="p-3 text-sm font-semibold text-gray-600">Difficulté</th>
+                        <th className="p-3 text-sm font-semibold text-gray-600">Score ROI</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...(project.risk_results.scenario_breakdown || [])]
+                        .sort((a, b) => b.roi - a.roi)
+                        .map((s, idx) => {
+                          const riskReduction = s.initial_score - s.residual_score;
+                          return (
+                            <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
+                              <td className="p-3 text-sm font-bold">{s.scenario_id}</td>
+                              <td className="p-3 text-sm">
+                                <span className={`px-2 py-1 rounded text-xs font-semibold ${s.decision === 'Reduce' ? 'bg-green-100 text-green-800' : s.decision === 'Accept' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>
+                                  {s.decision}
+                                </span>
+                              </td>
+                              <td className="p-3 text-sm text-gray-600">
+                                {s.iso_control && <span className="block border border-blue-200 bg-blue-50 text-blue-700 px-2 rounded mb-1 text-xs">{s.iso_control}</span>}
+                                {s.cis_control && <span className="block border border-purple-200 bg-purple-50 text-purple-700 px-2 rounded text-xs">{s.cis_control}</span>}
+                                {(!s.iso_control && !s.cis_control) && <span className="text-gray-400 italic">Non mappé</span>}
+                              </td>
+                              <td className="p-3 text-sm text-green-600 font-semibold">-{riskReduction > 0 ? riskReduction : 0}</td>
+                              <td className="p-3 text-sm">
+                                {s.difficulty === 1 ? '🟢 Faible' : s.difficulty === 2 ? '🟡 Moyenne' : s.difficulty === 3 ? '🔴 Élevée' : 'N/A'}
+                              </td>
+                              <td className="p-3 text-sm font-bold text-ebios-orange">{s.roi}</td>
+                            </tr>
+                          );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

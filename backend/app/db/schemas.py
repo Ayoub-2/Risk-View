@@ -5,6 +5,7 @@ from typing import List, Optional
 class BaselineControl(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     implemented: bool
+    evidence: str = Field(default="", max_length=1000, description="Definition of done / evidence examples")
 
 # EBIOS RM Workshop 2: Risk Origins & Target Objectives
 class RiskOrigin(BaseModel):
@@ -29,6 +30,10 @@ class RiskTreatment(BaseModel):
     scenario_id: str
     decision: str = Field(..., description="Accept, Reduce, Transfer, Avoid")
     security_measure: str = Field(..., max_length=1000)
+    evidence: str = Field(default="", max_length=1000, description="Definition of done / expected evidence")
+    difficulty: int = Field(default=2, ge=1, le=3, description="Implementation difficulty: 1(Low), 2(Medium), 3(High)")
+    iso_control: str = Field(default="", max_length=255)
+    cis_control: str = Field(default="", max_length=255)
     residual_likelihood: int = Field(..., ge=1, le=4)
     residual_impact: int = Field(..., ge=1, le=4)
 
