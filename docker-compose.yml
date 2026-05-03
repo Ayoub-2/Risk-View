@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: risk_view_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres:5432/security_dashboard
+      - SECRET_KEY=your_secure_random_secret_key_here
+    depends_on:
+      - postgres
+    networks:
+      - risk_network
+
+  frontend:
+    build: ./frontend
+    container_name: risk_view_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:8000/api/v1
+    depends_on:
+      - backend
+    networks:
+      - risk_network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: risk_view_postgres
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=security_dashboard
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - risk_network
+
+networks:
+  risk_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

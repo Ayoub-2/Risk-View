@@ -1,0 +1,11 @@
+fastapi
+asyncpg
+uvicorn
+pydantic
+python-jose[cryptography]
+python-dotenv
+passlib
+fpdf
+reportlab
+pydantic_settings
+pydantic[email]
