@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-05-04
+
+### Added
+- Added `backend/app/api/dependencies.py` as the shared location for authentication, assessment ownership checks, and assessment serialization helpers.
+
+### Changed
+- Standardized export endpoints to:
+  - `GET /api/v1/assessments/{id}/export/json`
+  - `GET /api/v1/assessments/{id}/export/pdf`
+- Refactored backend route modules to reuse shared auth and assessment access helpers instead of duplicating the same logic across files.
+- Updated `frontend/src/pages/ProjectDetails.jsx` to use the standardized export routes.
+- Updated `frontend/src/pages/Dashboard.jsx` to sort project history with a non-mutating pattern and to use the app-level logout callback.
+- Updated `README.md` to reflect the v1.1.0 cleanup, canonical backend entrypoint, actual project structure, and current endpoint conventions.
+
+### Removed
+- Removed legacy backend entrypoint `backend/app/app.py`.
+- Removed legacy backend schema file `backend/app/db/models.py`.
+- Removed legacy frontend files:
+  - `frontend/src/components/AuthForm.jsx`
+  - `frontend/src/components/InputForm.jsx`
+  - `frontend/src/pages/Home.jsx`
+
+### Security Impact
+- Reduced duplicate authorization code paths by centralizing token-based user resolution and owned-assessment lookup logic.
+- Kept the existing authenticated export protections while making the route contract more consistent and easier to audit.
+
+## [1.0.0] - Initial documented release
+
 ### Added
 - **GRC Feature Expansion:** Integrated advanced InfoSecPanda-inspired features:
   - **Evidence Checklists:** "Definition-of-Done" fields for Baseline Controls and Risk Treatments to prove compliance.

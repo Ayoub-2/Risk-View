@@ -1,36 +1,17 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse, StreamingResponse
-from app.db import database as db
 import io
 from fpdf import FPDF
-from datetime import datetime
-from app.api.v1.routes_assessments import get_current_user
+from app.api.dependencies import get_current_user, get_owned_assessment_record, serialize_assessment_record
 
 router = APIRouter()
 
-def build_assessment_dict(record):
-    """Combine postgres record fields into a single dict."""
-    doc = dict(record['data'])
-    doc["_id"] = str(record['id'])
-    doc["user_id"] = str(record['user_id'])
-    doc["system_name"] = record['system_name']
-    doc["created_at"] = record['created_at'].isoformat()
-    return doc
-
 # ✅ JSON EXPORT
-@router.get("/assessment/{id}/json")
+@router.get("/assessments/{id}/export/json")
 async def export_json(id: int, user: dict = Depends(get_current_user)):
     try:
-        async with db.db.pool.acquire() as conn:
-            record = await conn.fetchrow("SELECT id, user_id, system_name, created_at, data FROM assessments WHERE id = $1", id)
-            
-        if not record:
-            raise HTTPException(status_code=404, detail="Assessment not found")
-            
-        if record["user_id"] != user["id"]:
-            raise HTTPException(status_code=403, detail="Not authorized to access this assessment")
-
-        assessment = build_assessment_dict(record)
+        record = await get_owned_assessment_record(id, user["id"])
+        assessment = serialize_assessment_record(record)
         return JSONResponse(content=assessment)
     except HTTPException:
         raise
@@ -39,19 +20,11 @@ async def export_json(id: int, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail="Internal server error during export")
 
 # ✅ PDF EXPORT
-@router.get("/assessment/{id}/pdf")
+@router.get("/assessments/{id}/export/pdf")
 async def export_pdf(id: int, user: dict = Depends(get_current_user)):
     try:
-        async with db.db.pool.acquire() as conn:
-            record = await conn.fetchrow("SELECT id, user_id, system_name, created_at, data FROM assessments WHERE id = $1", id)
-            
-        if not record:
-            raise HTTPException(status_code=404, detail="Assessment not found")
-            
-        if record["user_id"] != user["id"]:
-            raise HTTPException(status_code=403, detail="Not authorized to access this assessment")
-
-        assessment = build_assessment_dict(record)
+        record = await get_owned_assessment_record(id, user["id"])
+        assessment = serialize_assessment_record(record)
 
         pdf = FPDF()
         pdf.add_page()

@@ -27,7 +27,7 @@ export default function ProjectDetails({ isNew }) {
 
   const handleExport = async (format) => {
     try {
-      const res = await api.get(`/assessment/${id}/${format}`, { responseType: 'blob' });
+      const res = await api.get(`/assessments/${id}/export/${format}`, { responseType: 'blob' });
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;

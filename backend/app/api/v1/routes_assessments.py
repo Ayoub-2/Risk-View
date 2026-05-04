@@ -1,39 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from fastapi.encoders import jsonable_encoder
-from jose import jwt, JWTError
+from fastapi import APIRouter, Depends, HTTPException
 from datetime import datetime
-from app.core.config import settings
 from app.db import database as db
 from app.db.schemas import EbiosAssessmentInput
+from app.api.dependencies import get_current_user, get_owned_assessment_record, serialize_assessment_record
 from app.services import risk_model
-import json
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
-
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        email = payload.get("sub")
-        if email is None:
-            raise credentials_exception
-            
-        async with db.db.pool.acquire() as conn:
-            user = await conn.fetchrow("SELECT * FROM users WHERE email = $1", email)
-            
-        if user is None:
-            raise credentials_exception
-        # Convert record to dict
-        return dict(user)
-    except JWTError:
-        raise credentials_exception
 
 @router.get("/annexes")
 async def get_ebios_annexes():
@@ -86,12 +58,7 @@ async def get_assessments(user: dict = Depends(get_current_user)):
             records = await conn.fetch("SELECT id, system_name, created_at, data FROM assessments WHERE user_id = $1 ORDER BY created_at DESC", user['id'])
             
         for record in records:
-            doc = dict(record['data'])
-            doc["_id"] = str(record['id'])
-            doc["system_name"] = record['system_name']
-            doc["user_id"] = str(user['id'])
-            doc["created_at"] = record['created_at'].isoformat()
-            results.append(doc)
+            results.append(serialize_assessment_record(record))
             
         return results
     except Exception as e:
@@ -117,11 +84,9 @@ async def update_assessment(id: int, data: EbiosAssessmentInput, user: dict = De
     }
 
     try:
+        await get_owned_assessment_record(id, user['id'])
+
         async with db.db.pool.acquire() as conn:
-            existing = await conn.fetchrow("SELECT id FROM assessments WHERE id = $1 AND user_id = $2", id, user['id'])
-            if not existing:
-                raise HTTPException(status_code=404, detail="Assessment not found or unauthorized")
-                
             await conn.execute(
                 "UPDATE assessments SET system_name = $1, data = $2 WHERE id = $3",
                 data.system_name,
@@ -144,19 +109,8 @@ async def update_assessment(id: int, data: EbiosAssessmentInput, user: dict = De
 @router.get("/assessments/{id}")
 async def get_assessment_by_id(id: int, user: dict = Depends(get_current_user)):
     try:
-        async with db.db.pool.acquire() as conn:
-            record = await conn.fetchrow("SELECT id, system_name, created_at, data FROM assessments WHERE id = $1 AND user_id = $2", id, user['id'])
-            
-        if not record:
-            raise HTTPException(status_code=404, detail="Assessment not found or unauthorized")
-            
-        doc = dict(record['data'])
-        doc["_id"] = str(record['id'])
-        doc["system_name"] = record['system_name']
-        doc["user_id"] = str(user['id'])
-        doc["created_at"] = record['created_at'].isoformat()
-            
-        return doc
+        record = await get_owned_assessment_record(id, user['id'])
+        return serialize_assessment_record(record)
     except HTTPException:
         raise
     except Exception as e:

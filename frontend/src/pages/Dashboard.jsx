@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
-export default function Dashboard() {
+export default function Dashboard({ onLogout }) {
   const [history, setHistory] = useState([]);
   const [sortBy, setSortBy] = useState("date");
   const navigate = useNavigate();
@@ -19,16 +19,18 @@ export default function Dashboard() {
     fetchHistory();
   }, []);
 
-  const filtered = history.sort((a, b) => {
-    if (sortBy === "risk") return b.average_initial_risk - a.average_initial_risk;
-    return new Date(b.created_at) - new Date(a.created_at);
-  });
+  const filtered = useMemo(() => {
+    return [...history].sort((a, b) => {
+      if (sortBy === "risk") return b.average_initial_risk - a.average_initial_risk;
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+  }, [history, sortBy]);
 
   return (
     <div className="p-8 relative">
       <button
         onClick={() => {
-          localStorage.removeItem("token");
+          onLogout?.();
           navigate("/login");
         }}
         className="absolute top-4 right-4 bg-gray-200 text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-300 transition"

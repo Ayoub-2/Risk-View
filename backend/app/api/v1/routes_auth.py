@@ -1,13 +1,10 @@
-from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from fastapi import APIRouter, HTTPException
 
 from app.db import database as db
 from app.db.schemas import UserCreate, UserLogin, Token
 from app.core.security import hash_password, verify_password, create_access_token
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
 
 # --- Register Endpoint ---
 

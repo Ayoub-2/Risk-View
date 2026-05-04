@@ -1,5 +1,5 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-blue.svg)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-blue.svg)
 
 # RiskView: Plateforme d'Analyse des Risques (EBIOS RM / ISO 27005)
 
@@ -7,7 +7,7 @@ A professional-grade, French-localized dashboard built for Governance, Risk, and
 
 ---
 
-## 🌐 Project Overview (v1.0.0)
+## 🌐 Project Overview (v1.1.0)
 
 RiskView has evolved into a fully-fledged **Project Management Architecture**. It allows users to:
 
@@ -17,6 +17,7 @@ RiskView has evolved into a fully-fledged **Project Management Architecture**. I
 - View risks visually via interactive Heatmaps.
 - Export assessment reports to JSON or PDF.
 - Authenticate securely via JWT-based login.
+- Operate on a simplified codebase with legacy flows removed and a single canonical backend entrypoint.
 
 ---
 
@@ -28,7 +29,6 @@ RiskView has evolved into a fully-fledged **Project Management Architecture**. I
 - 📝 **Continuous Assessment:** `PUT` APIs allow for continuous updating of existing risk scenarios without duplicating records.
 - 🔐 **Secure Authentication:** JWT-based sessions with hashed passwords and IDOR protection.
 - 📊 **Risk Scoring with Visual Charts:** Dynamic, responsive heatmaps based on EBIOS standard annexes.
-
 ---
 
 ## ⚙️ Tech Stack
@@ -36,7 +36,7 @@ RiskView has evolved into a fully-fledged **Project Management Architecture**. I
 **Frontend:**
 - React.js (React Router for Workspace Navigation)
 - Tailwind CSS (Custom Design System)
-- Chart.js (Heatmaps)
+- Custom React-based 4x4 Heatmap rendering
 - Axios
 
 **Backend:**
@@ -76,8 +76,8 @@ docker compose down
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/abdmath/Security-Risk-Assessment-Dashboard.git
-cd Security-Risk-Assessment-Dashboard
+git clone <your-repository-url>
+cd Risk-View
 ```
 
 ### 2. Backend Setup (FastAPI - Windows Focus)
@@ -107,6 +107,8 @@ Run the FastAPI server:
 uvicorn app.main:app --reload
 ```
 
+The canonical backend entrypoint is `backend/app/main.py`.
+
 ### 3. Frontend Setup (React)
 
 ```bash
@@ -129,11 +131,13 @@ npm start
 ## 📁 Project Structure
 
 ```text
-Risk View/
+Risk-View/
 │
 ├── backend/
 │   ├── app/
-│   │   ├── api/v1/ (API Routes including auth, assessments, exports)
+│   │   ├── api/
+│   │   │   ├── dependencies.py (Shared auth and assessment helpers)
+│   │   │   └── v1/ (API routes including auth, assessments, exports)
 │   │   ├── core/   (Security & configuration)
 │   │   ├── db/     (PostgreSQL connection pool & Pydantic Schemas)
 │   │   └── services/ (Risk Model Calculation logic)
@@ -149,11 +153,22 @@ Risk View/
 │   ├── tailwind.config.js
 │   └── package.json
 │
-├── project-docs/       (QA Reports, Analysis, Evidence, PoC)
+├── cleanup-plan.md
 ├── docker-compose.yml
 ├── VERSION
 └── README.md
 ```
+
+---
+
+## 🔌 API Notes
+
+- Base API path: `/api/v1`
+- Assessment detail route: `GET /api/v1/assessments/{id}`
+- Assessment update route: `PUT /api/v1/assess/{id}`
+- Export routes:
+	- `GET /api/v1/assessments/{id}/export/json`
+	- `GET /api/v1/assessments/{id}/export/pdf`
 
 ---
 
