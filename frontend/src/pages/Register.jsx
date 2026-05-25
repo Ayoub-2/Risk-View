@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { toast } from "react-toastify";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -12,10 +13,11 @@ export default function Register() {
     e.preventDefault();
     try {
       await api.post("/register", { email, password });
-      alert("Inscription réussie, vous pouvez maintenant vous connecter.");
-      navigate("/login");
+      toast.success("Inscription réussie ! Vous pouvez maintenant vous connecter.");
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       setError("L'email existe déjà ou la saisie est invalide.");
+      toast.error("Échec de l'inscription. L'email existe déjà ou la saisie est invalide.");
     }
   };
 

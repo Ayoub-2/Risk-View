@@ -45,5 +45,15 @@ class Database:
                     data JSONB
                 );
             ''')
+            
+            await conn.execute('''
+                CREATE TABLE IF NOT EXISTS workspace_shares (
+                    id SERIAL PRIMARY KEY,
+                    assessment_id INT REFERENCES assessments(id) ON DELETE CASCADE,
+                    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+                    role VARCHAR(50) NOT NULL,
+                    UNIQUE(assessment_id, user_id)
+                );
+            ''')
 
 db = Database()

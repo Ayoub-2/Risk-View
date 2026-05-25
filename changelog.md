@@ -2,7 +2,52 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.0.0-rc1] - 2026-05-25
+
+### Added
+- **Collaborative Workspaces & RBAC:**
+  - Implemented database permissions table `workspace_shares` linking users and EBIOS assessments with active foreign key cascade deletes.
+  - Added sharing REST API endpoints: `GET /assessments/{id}/shares` (get collaborators list), `POST /assessments/{id}/share` (invite teammate by email), and `DELETE /assessments/{id}/share/{share_id}` (revoke workspace share).
+  - Added robust role verification dependency `get_permitted_assessment_record` protecting EBIOS details, EBIOS updates, and JSON/PDF exports.
+  - Built invite/revoke overlay share modal in `ProjectDetails.jsx` for workspace owners.
+  - Added color-coded role tags (`Propriétaire`, `Contributeur`, `Auditeur`) to project listings in `Dashboard.jsx`.
+  - Added dynamic read-only locks wrapping EBIOS forms in `<fieldset disabled={readOnly}>` and warning banners in `EBIOSForm.jsx` to block Auditor modifications.
+  - Disabled SoA textareas and hid the Save button in the Statement of Applicability cockpit for Auditor roles.
+
+### Fixed
+- **Export Route Isolation:** Corrected export routes to allow permitted workspace contributors and auditors to execute JSON/PDF exports, while retaining direct blockages on unauthorized users.
+- **EBIOSForm JSX Syntax Mismatch:** Patched `EBIOSForm.jsx` to resolve a missing `</div>` tag that caused Webpack JSX parsing to fail (Unterminated JSX contents error). Recompile now succeeds flawlessly.
+
+### Security Impact
+- **RBAC Server-Side Enforcement:** Ensures that read-only auditors are barred from executing manual PUT payloads, returning a strict `403 Forbidden` response.
+- **IDOR Protection:** Completely mitigates sequential assessment enumeration scans by verifying active workspace permit listings on all retrieval routes.
+- **Safe Failure Modes:** Ensured that unauthorized access attempts fail loudly in the backend with generalized error states, leaving database schemas hidden.
+
+## [1.2.0] - 2026-05-25
+
+### Added
+- **EBIOS RM Visual Analytics Dashboard:** Integrated dynamic executive GRC diagnostics (Socle de Sécurité WS1, Scénarios Évalués WS3/4, Risques Critiques, Atténuation Globale) and comparative side-by-side Recharts bar charts in `ProjectDetails.jsx`.
+- **ISO 27001 Statement of Applicability (SoA) Compliance Engine:**
+  - Implemented dynamic mapping logic cross-referencing Workshop 1 baseline controls and Workshop 5 risk treatments to categorize the 93 ISO 27001:2022 Annex A controls into *Applicable (Implémenté)*, *Applicable (En cours)*, and *Non Applicable (Exclus)*.
+  - Added `soa_justifications` JSONB dictionary schema to the FastAPI Pydantic validator (`EbiosAssessmentInput`) to securely serialize and persist compliance justifications in PostgreSQL.
+  - Refactored frontend to render an interactive Statement of Applicability matrix tab complete with domain filters (A.5, A.6, A.7, A.8), 4-card KPI summaries, and inline justification editors.
+- **Premium ReportLab PDF Export Engine:**
+  - Migrated backend export logic from standard FPDF to a high-fidelity ReportLab Platypus engine.
+  - Implemented corporate styled cover page and custom A4 double-pass page-number canvas (`NumberedCanvas`) printing dynamic `"Page X sur Y"` footers, header dividers, and methodology citations.
+  - Designed dynamic row-level risk severity color-coding, cell-wrapping Paragraph flowables, and column width bounds.
+  - Appended **Annexe : Déclaration d'Applicabilité (ISO/IEC 27001:2022)** to the PDF export incorporating the 93 controls, compliance statuses, and user justifications.
+- **Improved Global Notifications:** Replaced legacy blocking browser `alert()` popups in `ProjectDetails.jsx`, `EBIOSForm.jsx`, and `Register.jsx` with animated, non-blocking toast notifications using `react-toastify`.
+
+### Fixed
+- **Assessments List KeyError:** Fixed database `SELECT` query in `get_assessments` route within `routes_assessments.py` to fetch the `user_id` column explicitly, preventing 500 Internal Server Errors during JSON serialization.
+- **Reload Redirection Race Condition:** Fixed React Router session loader race condition in `App.js` by initializing `token` state synchronously from `localStorage` on frame load, preventing unwanted session disconnections on reload or updates.
+
+### Security Impact
+- **IDOR Protections:** Ensured JWT authentication checks and ownership matches are enforced on all newly added routes and exports.
+- **Input Validation & Sanitization:** Schema-less justifications and EBIOS parameters are validated through strict Pydantic character count limits and data type boundaries.
+- **SSRF & HTML Injection Mitigated:** ReportLab PDF builder handles all user inputs as plain flowables under Helvetica, completely mitigating SSRF and script execution vectors.
+- **Reduced Information Disclosure:** Fixed the 500 error key mismatch, ensuring database errors are handled gracefully without exposing stack traces.
+
 
 ## [1.1.0] - 2026-05-04
 

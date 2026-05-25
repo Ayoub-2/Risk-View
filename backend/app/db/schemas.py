@@ -37,6 +37,23 @@ class RiskTreatment(BaseModel):
     residual_likelihood: int = Field(..., ge=1, le=4)
     residual_impact: int = Field(..., ge=1, le=4)
 
+# STRIDE Threat Modeling Asset & Data Flow
+class AssetModel(BaseModel):
+    id: str = Field(..., max_length=50)
+    name: str = Field(..., max_length=100)
+    asset_type: str = Field(..., description="Database, API, WebApp, gateway, AD, etc.")
+    is_isolated: bool = False
+
+class DataFlowModel(BaseModel):
+    source: str = Field(..., max_length=50)
+    target: str = Field(..., max_length=50)
+    protocol: str = Field(..., max_length=50)
+    crosses_boundary: bool = False
+
+class ThreatModelStructure(BaseModel):
+    assets: List[AssetModel] = Field(default_factory=list, max_length=100)
+    flows: List[DataFlowModel] = Field(default_factory=list, max_length=100)
+
 # Aggregate Assessment Input
 class EbiosAssessmentInput(BaseModel):
     system_name: str = Field(..., min_length=1, max_length=255)
@@ -45,6 +62,8 @@ class EbiosAssessmentInput(BaseModel):
     risk_origins: List[RiskOrigin] = Field(default_factory=list, max_length=50)
     scenarios: List[RiskScenario] = Field(default_factory=list, max_length=100)
     treatments: List[RiskTreatment] = Field(default_factory=list, max_length=100)
+    soa_justifications: Optional[dict] = Field(default_factory=dict, description="ISO 27001 SoA justifications map")
+    threat_model: Optional[ThreatModelStructure] = Field(default=None, description="STRIDE Threat modeling configuration")
 
 # For user registration/login
 class UserCreate(BaseModel):
@@ -59,3 +78,14 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+# For workspace sharing
+class WorkspaceShareInput(BaseModel):
+    email: EmailStr
+    role: str = Field(..., description="Contributor or Auditor")
+
+class WorkspaceShareResponse(BaseModel):
+    id: int
+    user_id: int
+    email: EmailStr
+    role: str

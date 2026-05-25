@@ -77,8 +77,17 @@ export default function Dashboard({ onLogout }) {
               <tbody>
                 {filtered.map((item) => (
                   <tr key={item._id} className="hover:bg-orange-50 transition border-b border-gray-100">
-                    <td className="p-4 border-r border-gray-200 font-bold text-ebios-orange cursor-pointer hover:underline" onClick={() => navigate(`/project/${item._id}`)}>
-                      {item.system_name}
+                    <td className="p-4 border-r border-gray-200 font-bold cursor-pointer" onClick={() => navigate(`/project/${item._id}`)}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-ebios-orange hover:underline">{item.system_name}</span>
+                        <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full border ${
+                          item.role === 'Owner' ? 'bg-orange-50 text-orange-600 border-orange-200' :
+                          item.role === 'Contributor' ? 'bg-green-50 text-green-700 border-green-200' :
+                          'bg-gray-50 text-gray-500 border-gray-200'
+                        }`}>
+                          {item.role === 'Owner' ? 'Propriétaire' : item.role === 'Contributor' ? 'Contributeur' : 'Auditeur'}
+                        </span>
+                      </div>
                     </td>
                     <td className="p-4 border-r border-gray-200 truncate max-w-xs">{item.context_description}</td>
                     <td className="p-4 border-r border-gray-200 text-red-600 font-bold text-center">{item.average_initial_risk}</td>

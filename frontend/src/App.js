@@ -6,16 +6,14 @@ import Register from "./pages/Register";
 import ProjectDetails from "./pages/ProjectDetails";
 
 import Footer from "./components/Footer";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  const [token, setToken] = useState(null);
-
-  useEffect(() => {
+  const [token, setToken] = useState(() => {
     const storedToken = localStorage.getItem("token");
-    if (storedToken && storedToken !== "undefined" && storedToken !== "null") {
-      setToken(storedToken);
-    }
-  }, []);
+    return (storedToken && storedToken !== "undefined" && storedToken !== "null") ? storedToken : null;
+  });
 
   const handleLogin = (newToken) => {
     localStorage.setItem("token", newToken);
@@ -70,6 +68,7 @@ function App() {
           </Routes>
         </main>
         <Footer />
+        <ToastContainer position="top-right" autoClose={4000} theme="colored" />
       </div>
     </Router>
   );

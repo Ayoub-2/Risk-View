@@ -1,5 +1,5 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-blue.svg)
+![Version: 2.0.0-rc1](https://img.shields.io/badge/Version-2.0.0--rc1-orange.svg)
 
 # RiskView: Plateforme d'Analyse des Risques (EBIOS RM / ISO 27005)
 
@@ -7,15 +7,16 @@ A professional-grade, French-localized dashboard built for Governance, Risk, and
 
 ---
 
-## 🌐 Project Overview (v1.1.0)
+## 🌐 Project Overview (v2.0.0-rc1)
 
-RiskView has evolved into a fully-fledged **Project Management Architecture**. It allows users to:
+RiskView has evolved into a fully-fledged **Collaborative Workspace & Project Management Architecture**. It allows users to:
 
 - Create and manage persistent security assessment "Workspaces" for various IT systems.
+- View a **Visual GRC Cockpit** containing diagnostic KPI cards (conformity index, critical risk count, attenuation rate) and dynamic **Comparative Risk Score Bar Charts** using Recharts.
 - Use a **Tabbed Editor** to systematically progress through EBIOS RM workshops (Context, Risk Origins, Strategic/Operational Scenarios, Risk Treatment).
-- Automatically calculate Initial and Residual risk scores based on standardized EBIOS 4-level scales.
-- View risks visually via interactive Heatmaps.
-- Export assessment reports to JSON or PDF.
+- View residual risks visually via interactive 4x4 standard EBIOS Risk Matrices.
+- Export premium, publication-grade **PDF Executive Reports** powered by ReportLab, featuring structured cover pages, auto-wrapping styled tables, and dynamic risk severity row color-coding.
+- Export raw assessment schema to JSON.
 - Authenticate securely via JWT-based login.
 - Operate on a simplified codebase with legacy flows removed and a single canonical backend entrypoint.
 
@@ -25,10 +26,15 @@ RiskView has evolved into a fully-fledged **Project Management Architecture**. I
 
 - 🇫🇷 **French Localization:** Native alignment with ANSSI terminology (Vraisemblance, Gravité, Bien Support, etc.).
 - 🎨 **Premium Aesthetic:** Modern UI featuring the "Orange EBIOS" color palette and "Outfit" typography.
+- 🛡️ **ISO 27001 SoA Compliance Engine:**
+  - **Dynamic Cross-Workshop Mapping:** Automatically cross-references security measures from Workshop 1 (Socle) and Workshop 5 (Traitements) to classify Annex A controls.
+  - **Interactive Matrix Tab:** Allows seamless switching to the SoA tab containing domain filters (A.5, A.6, A.7, A.8), progress KPI metrics, and inline exclusion justifications.
+  - **Publication-Grade PDF Annex:** Automatically generates and appends an official Statement of Applicability Annex to the ReportLab PDF export with color-coded status rows.
 - 🏢 **Project Workspaces:** A dedicated launchpad to view, sort, and re-enter existing risk assessments.
+- 👥 **Collaborative Workspaces & RBAC:** Multi-tenant workspace sharing with custom roles (`Owner`, `Contributor`, `Auditor`). Read-only auditor view with automatic `<fieldset>` form locks, and permission-isolated backend routing.
 - 📝 **Continuous Assessment:** `PUT` APIs allow for continuous updating of existing risk scenarios without duplicating records.
 - 🔐 **Secure Authentication:** JWT-based sessions with hashed passwords and IDOR protection.
-- 📊 **Risk Scoring with Visual Charts:** Dynamic, responsive heatmaps based on EBIOS standard annexes.
+- 📊 **Risk Scoring with Visual Charts:** Dynamic, responsive heatmaps and comparative Recharts bar charts based on EBIOS standard annexes.
 ---
 
 ## ⚙️ Tech Stack
@@ -174,10 +180,9 @@ Risk-View/
 
 ## 🔮 Future Enhancements (Roadmap)
 
-- **Evidence Checklists:** "Definition-of-Done" fields to link controls to actual evidence.
-- **Difficulty vs. Priority Ratings:** ROI tracking for risk treatments.
-- **Cross-Walk Mapping:** Integrating ISO 27001 Annex A controls directly into the risk treatment selection.
-- **Interactive Contextual Guidance:** Fly-out panels explaining threat sources and impacts in plain language.
+- **Multilingual UI i18n Localization:** Full, runtime dynamic toggle between English and French catalogs and interface layouts.
+- **Interactive STRIDE/LINDDUN Threat Modeling:** Advanced visual module to map system supports directly to structured threat categories.
+- **CVE/GHSA Vulnerability Integration:** Automated feeds fetching known CVEs to enrich Workshop 3 and 4 supporting asset vulnerability assessments.
 
 ---
 
